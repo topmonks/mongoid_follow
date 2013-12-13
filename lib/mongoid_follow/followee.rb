@@ -3,6 +3,8 @@ module Mongoid
     extend ActiveSupport::Concern
 
     included do |base|
+      after_destroy :reset_followers
+
       base.field    :fferc, :type => Integer, :default => 0
       base.has_many :followers, :class_name => 'Follow', :as => :follower, :dependent => :destroy
     end
@@ -63,6 +65,11 @@ module Mongoid
       self_followers = get_followers_of(self)
 
       self_followers & model_followers
+    end
+
+    # unfollow by each follower
+    def reset_followers
+      self.all_followers.map { |follower| follower.unfollow self }
     end
 
     private

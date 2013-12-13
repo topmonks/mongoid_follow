@@ -204,6 +204,24 @@ describe Mongoid::Follower do
         @gang.respond_to?('before_followed_by').should be_true
         @gang.respond_to?('after_followed_by').should be_false
       end
+
+      it "should be unfollowed by each follower after destroy" do
+        @bonnie.follow(@clyde)
+        @alec.follow(@clyde)
+
+        @clyde.destroy
+        @bonnie.all_followees.include?(@clyde).should == false
+        @alec.all_followees.include?(@clyde).should == false
+      end
+
+      it "should be unfollowed after follower destroy" do
+        @bonnie.follow(@clyde)
+        @alec.follow(@clyde)
+
+        @bonnie.destroy
+        @clyde.all_followers.include?(@bonnie).should == false
+        @clyde.all_followers.include?(@alec).should == true
+      end
     end
 
   end
