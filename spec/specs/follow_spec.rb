@@ -13,6 +13,14 @@ describe Mongoid::Follower do
       @gang = Group.create(:name => 'Gang')
     end
 
+    it "should have timestamp" do
+      @bonnie.followed_since(@clyde).should be_nil
+
+      @bonnie.follow(@clyde)
+
+      @bonnie.followed_since(@clyde).should_not be_nil
+    end
+
     it "should have no follows or followers" do
       @bonnie.follows?(@clyde).should be_false
 
@@ -210,8 +218,9 @@ describe Mongoid::Follower do
         @alec.follow(@clyde)
 
         @clyde.destroy
-        @bonnie.all_followees.include?(@clyde).should == false
-        @alec.all_followees.include?(@clyde).should == false
+
+        @bonnie.reload.all_followees.include?(@clyde).should == false
+        @alec.reload.all_followees.include?(@clyde).should == false
       end
 
       it "should be unfollowed after follower destroy" do
@@ -219,8 +228,9 @@ describe Mongoid::Follower do
         @alec.follow(@clyde)
 
         @bonnie.destroy
-        @clyde.all_followers.include?(@bonnie).should == false
-        @clyde.all_followers.include?(@alec).should == true
+
+        @clyde.reload.all_followers.include?(@bonnie).should == false
+        @clyde.reload.all_followers.include?(@alec).should == true
       end
     end
 

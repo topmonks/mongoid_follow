@@ -5,8 +5,7 @@ require "mongoid"
 require "rspec"
 
 Mongoid.configure do |config|
-  name = "mongoid_follow_test"
-  config.master = Mongo::Connection.new.db(name)
+  config.connect_to("mongoid_follow_test")
 end
 
 require File.expand_path("../../lib/mongoid_follow", __FILE__)

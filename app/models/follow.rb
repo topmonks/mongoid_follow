@@ -1,5 +1,6 @@
 class Follow
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :ff_type
   field :ff_id
