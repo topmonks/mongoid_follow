@@ -130,7 +130,7 @@ module Mongoid
       followees = !model ? me.followees : me.followees.where(:ff_type => model.to_s)
 
       followees.collect do |f|
-        f.ff_type.constantize.find(f.ff_id)
+        f.ff_object
       end
     end
 
