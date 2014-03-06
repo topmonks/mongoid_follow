@@ -13,7 +13,7 @@ module Mongoid
     # Example:
     # => @bonnie.follow!(@clyde)
     def follow!(model, relation = "follow")
-      if self.id != model.id && !self.follows?(model)
+      if self != model && !self.follows?(model, relation)
         self.before_follow(model) if self.respond_to?('before_follow')
         self.followees.create!(:followee_type => model.class.name, :followee_id => model.id, relation: relation)
         self.after_follow(model) if self.respond_to?('after_follow')
@@ -28,7 +28,7 @@ module Mongoid
     # Example:
     # => @bonnie.unfollow!(@clyde)
     def unfollow!(model, relation = "follow")
-      if self.id != model.id && self.follows?(model)
+      if self != model && self.follows?(model, relation)
         self.before_unfollow(model) if self.respond_to?('before_unfollow')
         self.followees.where(:followee_type => model.class.name, :followee_id => model.id, relation: relation).destroy
         self.after_unfollow(model) if self.respond_to?('after_unfollow')
@@ -73,7 +73,7 @@ module Mongoid
     private
     # unfollow each followee
     def reset_followees
-      Follow.where(:followee_id => self.id).destroy_all
+      Follow.where(:followee_id => self.id, followee_type: self.class.name).destroy_all
     end
 
   end

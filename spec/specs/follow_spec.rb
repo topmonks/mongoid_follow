@@ -139,5 +139,77 @@ describe Mongoid::Follower do
       end
     end
 
+    describe "with other relation" do
+      it "should have no friends" do
+        @bonnie.follows?(@clyde, "friends").should be_false
+
+        @bonnie.follow!(@clyde, "friends")
+        @clyde.follower?(@alec, "friends").should be_false
+        @alec.follows?(@clyde, "friends").should be_false
+      end
+
+      it "can follow another User" do
+        @bonnie.follow!(@clyde, "friends")
+
+        @bonnie.follows?(@clyde, "friends").should be_true
+        @clyde.follower?(@bonnie, "friends").should be_true
+      end
+
+      it "can follow and friends another User" do
+        @bonnie.follow!(@clyde)
+        @bonnie.follow!(@clyde, "friends")
+
+        @bonnie.follows?(@clyde, "friends").should be_true
+        @bonnie.follows?(@clyde).should be_true
+        @clyde.follower?(@bonnie, "friends").should be_true
+        @clyde.follower?(@bonnie).should be_true
+
+        @bonnie.unfollow!(@clyde)
+
+        @bonnie.follows?(@clyde, "friends").should be_true
+        @bonnie.follows?(@clyde).should be_false
+        @clyde.follower?(@bonnie, "friends").should be_true
+        @clyde.follower?(@bonnie).should be_false
+      end
+
+      it "should decline to follow self" do
+        @bonnie.follow!(@bonnie, "friends").should be_false
+      end
+
+      it "should decline two follows" do
+        @bonnie.follow!(@clyde, "friends")
+
+        @bonnie.follow!(@clyde, "friends").should be_false
+      end
+
+      it "can unfollow another User" do
+        @bonnie.follows?(@clyde, "friends").should be_false
+        @clyde.follower?(@bonnie, "friends").should be_false
+
+        @bonnie.follow!(@clyde, "friends")
+        @bonnie.follows?(@clyde, "friends").should be_true
+        @clyde.follower?(@bonnie, "friends").should be_true
+
+        @bonnie.unfollow!(@clyde, "friends")
+        @bonnie.follows?(@clyde, "friends").should be_false
+        @clyde.follower?(@bonnie, "friends").should be_false
+      end
+
+      it "should decline unfollow of non-followed User" do
+        @bonnie.unfollow!(@clyde, "friends").should be_false
+      end
+
+      it "should decline unfollow of self" do
+        @bonnie.unfollow!(@bonnie, "friends").should be_false
+      end
+
+      it "can follow a group" do
+        @bonnie.follow!(@gang, "friends")
+
+        @bonnie.follows?(@gang, "friends").should be_true
+        @gang.follower?(@bonnie, "friends").should be_true
+      end
+    end
+
   end
 end

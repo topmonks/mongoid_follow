@@ -43,7 +43,7 @@ module Mongoid
     private
     # unfollow by each follower
     def reset_followers
-      Follow.where(:follower_id => self.id).destroy_all
+      Follow.where(:follower_id => self.id, follower_type: self.class.name).destroy_all
     end
 
   end
