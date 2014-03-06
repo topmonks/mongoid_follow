@@ -12,6 +12,8 @@ class Follow
   validates :followee, presence: true
 
   scope :by_relation, ->(relation) { where(relation: relation) }
+  scope :by_follower, ->(klass) { where(follower_type: klass.to_s) }
+  scope :by_followee, ->(klass) { where(followee_type: klass.to_s) }
 
   index({relation: 1})
   index({follower_id: 1, follower_type: 1, relation: 1})

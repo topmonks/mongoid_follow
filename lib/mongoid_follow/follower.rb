@@ -38,8 +38,15 @@ module Mongoid
       end
     end
 
-    def all_followees(relation = "follow")
-      followees.by_relation(relation).all.collect do |f|
+    # List all followees for given relation and klass
+    #
+    # Example:
+    # => @bonnie.all_followees("follow", User)
+    def all_followees(relation = "follow", klass = nil)
+      all = followees.by_relation(relation)
+      all = all.by_followee(klass) if klass
+
+      all.collect do |f|
         f.followee
       end
     end

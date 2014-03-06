@@ -74,6 +74,39 @@ describe Mongoid::Follower do
       @gang.follower?(@bonnie).should be_true
     end
 
+    describe "listing stuff" do
+      it "should list all followers" do
+        @bonnie.follow!(@clyde)
+
+        @alec.follow!(@clyde)
+        @clyde.all_followers.should == [@bonnie, @alec]
+      end
+
+      it "should list all followers by model" do
+        @bonnie.follow!(@gang)
+        @just_another_user.follow!(@gang)
+
+        @gang.all_followers.should == [@bonnie, @just_another_user]
+        @gang.all_followers("follow", User).should == [@bonnie]
+      end
+
+      it "should list all followees" do
+        @bonnie.follow!(@clyde)
+        # @bonnie.all_followees.should == [@clyde] # spec has an error on last #all_followees when this is called
+
+        @bonnie.follow!(@gang)
+        @bonnie.all_followees.should == [@clyde, @gang]
+      end
+
+      it "should list all followees by model" do
+        @bonnie.follow!(@gang)
+        @bonnie.follow!(@clyde)
+
+        @bonnie.all_followees.should == [@gang, @clyde]
+        @bonnie.all_followees("follow", User).should == [@clyde]
+      end
+    end
+
     describe "callback stuff" do
       # Duh... this is a useless spec... Hrmn...
       it "should respond on callbacks" do

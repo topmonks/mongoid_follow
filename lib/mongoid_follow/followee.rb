@@ -17,8 +17,15 @@ module Mongoid
       0 < self.followers.where(follower_type: model.class.name, :follower_id => model.id, relation: relation).limit(1).count
     end
 
-    def all_followers(relation = "follow")
-      followers.by_relation(relation).all.collect do |f|
+    # List all followers for given relation and klass
+    #
+    # Example:
+    # => @bonnie.all_followers("follow", User)
+    def all_followers(relation = "follow", klass = nil)
+      all = followers.by_relation(relation)
+      all = all.by_follower(klass) if klass
+
+      all.collect do |f|
         f.follower
       end
     end
