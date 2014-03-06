@@ -2,13 +2,19 @@ class Follow
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  field :ff_type
-  field :ff_id
+  field :relation, type: String
 
-  belongs_to :follower, :polymorphic => true
-  belongs_to :followee, :polymorphic => true
+  belongs_to :follower, :polymorphic => true, index: true
+  belongs_to :followee, :polymorphic => true, index: true
 
-  def ff_object
-    ff_type.constantize.find(ff_id)
-  end
+  validates :relation, presence: true
+  validates :follower, presence: true
+  validates :followee, presence: true
+
+  scope :by_relation, ->(relation) { where(relation: relation) }
+
+  index({relation: 1})
+  index({follower_id: 1, follower_type: 1, relation: 1})
+  index({followee_id: 1, follower_type: 1, relation: 1})
+  index({followee_id: 1, follower_type: 1, follower_id: 1, follower_type: 1, relation: 1})
 end
