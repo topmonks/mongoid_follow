@@ -111,11 +111,9 @@ describe Mongoid::Follower do
       # Duh... this is a useless spec... Hrmn...
       it "should respond on callbacks" do
         @bonnie.respond_to?('after_follow').should be_true
-        @bonnie.respond_to?('after_unfollowed_by').should be_true
-        @bonnie.respond_to?('before_follow').should be_false
-
-        @gang.respond_to?('before_followed_by').should be_true
-        @gang.respond_to?('after_followed_by').should be_false
+        @bonnie.respond_to?('before_follow').should be_true
+        @bonnie.respond_to?('before_unfollow').should be_true
+        @bonnie.respond_to?('before_unfollow').should be_true
       end
 
       it "should be unfollowed by each follower after destroy" do

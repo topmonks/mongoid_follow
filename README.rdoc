@@ -1,9 +1,12 @@
-= Follow feature for Rails3 with Mongoid
+= Follow feature for Rails4 with Mongoid2
+
+== Inspired by
+  appsbakery/mongoid_follow
 
 == Installation
 
 In Gemfile:
-  gem 'mongoid_follow'
+  gem 'mongoid_follow', github: "ciihla/mongoid_follow"
 
 == Legend (to ease complications)
 
@@ -32,18 +35,25 @@ You can then follow a model using:
   @bonnie = User.create
   @clyde = User.create
 
-  @bonnie.follow(@clyde)
-  @bonnie.unfollow(@clyde)
+  @bonnie.follow!(@clyde) # is the same like  @bonnie.follow!(@clyde, "follow")
+  @bonnie.unfollow!(@clyde) # is the same like  @bonnie.unfollow!(@clyde, "follow")
+
+You can specify different relations:
+
+  @bonnie.follow!(@clyde, "friends") #  @bonnie marked @clyde as friend
 
 You can also see whether a model is a follower of another model or if a model is a followee of another model:
 
-  @clyde.follower?(@bonnie)
-  @bonnie.followee?(@clyde)
+  @clyde.follows?(@bonnie) # is the same like  @clyde.follows?(@bonnie, "follow")
+  @bonnie.followee?(@clyde) # is the same like  @bonnie.followee?(@clyde, "follow")
+
+  @clyde.follows?(@bonnie, "friends") # @clyde marked @bonnie as his friend?
+  @bonnie.followee?(@clyde, "friends")
 
 You can also be a follower of other models
 
   @gang = Group.create
-  @bonnie.follow(@group)
+  @bonnie.follow!(@group) #  @bonnie.follow!(@group, "follow")
 
   @gang.follower?(@bonnie)
   @bonnie.follows?(@gang)
@@ -52,35 +62,19 @@ You can also be a follower of other models
 
 Get all followers/followees by
 
-  @gang.all_followers
-  @bonnie.all_followees
+  @gang.all_followers # is the same like @gang.all_followers("follow")
+  @bonnie.all_followees # is the same like @bonnie.all_followees("follow")
 
 You can also get followers/followees by a certain model
 
-  @gang.all_followers_by_model(User)
-  @bonnie.all_followees_by_model(Gang)
+  @gang.all_followers("follow", User)
+  @bonnie.all_followees("follow", Gang)
 
-=== Counting followers/followees
+== Specific queries
 
-Get the count of followers/followees using
+Get all users that I'm in a relation "friends" with:
 
-  @gang.followers_count
-  @bonnie.followees_count
-
-Or by a certain model by
-
-  @gang.followers_count_by_model(User)
-  @bonnie.followees_count_by_model(User)
-
-=== Dynamic methods
-
-You can use dynamic methods to shorten code for getting followers/followees or their count of a certain model by
-
-  @gang.all_user_followers
-  @bonnie.all_gang_followees
-
-  @gang.user_followers_count
-  @bonnie.user_followees_count
+  current_user.followees.where(followee_type: "User", relation: "friends") # current user acts as follower. Others are followees
 
 == Callbacks
 
@@ -96,20 +90,29 @@ You can attach callbacks to the follower/followee models before or after the fol
   before_unfollow
   after_unfollow
 
+== Example making friends with callbacks
 
-  # Followee model
-  def before_followed_by(follower)
-    puts 'Something here'
+In User model:
+
+  include Mongoid::Followee
+  include Mongoid::Follower
+
+  def after_follow(model)
+    if model.follows?(self)
+      self.follow!(model, "friends")
+      model.follow!(self, "friends")
+    end
   end
 
-  # Other followee callbacks
-  after_followed_by
-  before_unfollowed_by
-  after_unfollowed_by
+  def after_unfollow(model)
+    self.unfollow!(model, "friends")
+    model.unfollow!(self, "friends")
+  end
+
 
 Note: careful with using callbacks, we have no transaction so if it breaks on your callbacks, what gets saved is saved.
 
-* Any bug or issue, please send me an email to aeguintu@gmail.com
+* Any bug or issue, please send me an email to jan.uhlar@topmonks.com
 
 == For development
 
@@ -120,9 +123,6 @@ Note: careful with using callbacks, we have no transaction so if it breaks on yo
 
   rake spec/specs/follow_spec_rb
 
-== TODO
-
-* limit result of followers/followees
 
 == Thanks
 

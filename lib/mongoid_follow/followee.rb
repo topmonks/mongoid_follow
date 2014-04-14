@@ -30,16 +30,6 @@ module Mongoid
       end
     end
 
-    # get followers count
-    # Note: this is a cache counter
-    #
-    # Example:
-    # => @bonnie.followers_count
-    # => 1
-    def followers_count
-      self.followers.count
-    end
-
     private
     # unfollow by each follower
     def reset_followers
