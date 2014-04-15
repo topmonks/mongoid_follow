@@ -17,7 +17,7 @@ module Mongoid
         self.before_follow(model) if self.respond_to?('before_follow')
         self.followees.create!(:followee_type => model.class.name, :followee_id => model.id, relation: relation)
         self.after_follow(model) if self.respond_to?('after_follow')
-
+        return true
       else
         return false
       end
@@ -32,7 +32,7 @@ module Mongoid
         self.before_unfollow(model) if self.respond_to?('before_unfollow')
         self.followees.where(:followee_type => model.class.name, :followee_id => model.id, relation: relation).destroy
         self.after_unfollow(model) if self.respond_to?('after_unfollow')
-
+        return true
       else
         return false
       end
@@ -67,7 +67,7 @@ module Mongoid
     # => @bonnie.follows?(@clyde)
     # => true
     def follows?(model, relation = "follow")
-      0 < self.followees.where(followee_id: model.id, followee_type: model.class.name, relation: relation).limit(1).count
+      self.followees.where(followee_id: model.id, followee_type: model.class.name, relation: relation).exists?
     end
 
     private

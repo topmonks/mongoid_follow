@@ -14,7 +14,7 @@ module Mongoid
     # => @clyde.follower?(@bonnie)
     # => true
     def follower?(model, relation = "follow")
-      0 < self.followers.where(follower_type: model.class.name, :follower_id => model.id, relation: relation).limit(1).count
+      self.followers.where(follower_type: model.class.name, :follower_id => model.id, relation: relation).exists?
     end
 
     # List all followers for given relation and klass
