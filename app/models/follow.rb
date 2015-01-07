@@ -18,5 +18,5 @@ class Follow
   index({relation: 1})
   index({follower_id: 1, follower_type: 1, relation: 1})
   index({followee_id: 1, follower_type: 1, relation: 1})
-  index({followee_id: 1, follower_type: 1, follower_id: 1, follower_type: 1, relation: 1})
+  index({followee_id: 1, follower_type: 1, follower_id: 1, relation: 1})
 end
