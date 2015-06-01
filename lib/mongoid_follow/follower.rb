@@ -30,7 +30,7 @@ module Mongoid
     def unfollow!(model, relation = "follow")
       if self != model && self.follows?(model, relation)
         self.before_unfollow(model) if self.respond_to?('before_unfollow')
-        self.followees.where(:followee_type => model.class.name, :followee_id => model.id, relation: relation).destroy
+        self.followees.where(:followee_type => model.class.name, :followee_id => model.id, relation: relation).delete_all
         self.after_unfollow(model) if self.respond_to?('after_unfollow')
         return true
       else
