@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "mongoid_follow"
 
   s.add_dependency("mongoid", ">= 4.0.0.beta")
-  s.add_dependency "bson_ext"
   s.add_development_dependency "database_cleaner"
   s.add_development_dependency "rspec"
 
